@@ -1,6 +1,6 @@
 # ChainCTL — Architecture & Design Document
 
-**Status:** v6 — all 5 phases shipped (build/tests/clippy clean, every module verified against real live endpoints). ChainCTL is now the full blockchain developer toolkit described in the original goal, not just the faucet module. Telemetry is the one documented Phase 5 item intentionally not built (see §14) — everything else in the original command tree is implemented and working.
+**Status:** v6 — all 5 phases shipped (build/tests/clippy clean, every module verified against real live endpoints). ChainCTL is now the full blockchain developer toolkit described in the original goal, not just the faucet module. Telemetry is the one documented item intentionally not built — everything else in the original command tree is implemented and working.
 **Scope:** Module 1 (Testnet Faucet Discovery & Management) plus the platform architecture that lets future modules (`rpc`, `gas`, `explorer`, `wallet`, `abi`, `contract`, `tx`, `doctor`, `network`, `ens`) be added without refactoring.
 
 ---
@@ -121,7 +121,7 @@ chainctl/
 │   │       ├── gas.rs                # eth_gasPrice / eth_estimateGas
 │   │       ├── wallet.rs             # eth_getBalance
 │   │       ├── tx.rs                 # eth_getTransactionByHash + eth_getTransactionReceipt
-│   │       ├── abi.rs                # hand-rolled ABI encode/decode, keccak256, EIP-55 checksum (see §14 Phase 5)
+│   │       ├── abi.rs                # hand-rolled ABI encode/decode, keccak256, EIP-55 checksum
 │   │       ├── contract.rs           # encode call → eth_call → decode result
 │   │       ├── ens.rs                # namehash + registry/resolver eth_call resolution (mainnet)
 │   │       ├── browser.rs            # cross-platform "open URL" (the `open` crate)
@@ -362,7 +362,7 @@ Actual JSON Schema files (draft-07) for CI validation live at `docs/schemas/regi
 
 ## 8. Command Tree
 
-This is the actual shipped command surface (Phases 1–5 all landed — see §14):
+This is the actual shipped command surface:
 
 ```
 chainctl
@@ -391,7 +391,7 @@ chainctl
 │   ├── price <chain>
 │   └── estimate <chain> [--to] [--from] [--value] [--data]
 ├── wallet
-│   └── balance <chain> <address>             # read-only — no key generation, see §10 tradeoffs
+│   └── balance <chain> <address>             # read-only — no key generation, no signing
 ├── tx
 │   └── status <chain> <hash>
 ├── abi
@@ -430,7 +430,7 @@ chainctl
 4. **Per-host rate ceiling.** Independent of global concurrency, cap requests per host (e.g., 1 per 5 minutes) regardless of how many faucets on that domain are being checked, tracked via `cacherepo`.
 5. **Identify honestly.** Custom `User-Agent: chainctl/<version> (+https://github.com/akshat3106/ChainCTL-blockchain-developer-toolkit-CLI)` (derived at compile time from `CARGO_PKG_REPOSITORY`, so it tracks the manifest) so operators can identify and, if needed, block or contact the project — never spoof a browser UA.
 6. **Opt-out respected.** `excludeFromHealthCheck: true` in the registry entry (settable via PR by the faucet operator) skips active probing entirely; status shows `unknown (opt-out)`.
-7. **No claim-flow automation in the health engine** — it only checks reachability/latency/TLS of the published URL, never submits forms or attempts a claim. Automating claims is explicitly out of scope (see §10).
+7. **No claim-flow automation in the health engine** — it only checks reachability/latency/TLS of the published URL, never submits forms or attempts a claim. Automating claims is explicitly out of scope.
 8. **Background/scheduled checking is opt-in only** (`chainctl faucet status --watch`, or a user-installed cron); ChainCTL does not silently run a background daemon.
 
 ---
@@ -502,58 +502,3 @@ pub enum ChainctlError {
 ## 13. Repository Hygiene & CI
 
 Open-source scaffolding (`LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/` workflows, issue templates, release automation) is being set up separately and is intentionally out of scope for this document. For reference, the Rust-native equivalents of the tooling described earlier for a Go project would be: `clippy` + `rustfmt --check` for lint, `cargo test --workspace` matrix across OSes for CI, and `cargo-dist` (or `cross` + manual packaging) in place of `goreleaser` for cross-platform release builds, checksums, and Homebrew/Scoop publishing.
-
----
-
-## 14. Development Roadmap
-
-**Phase 1 — MVP**
-`chains`, `faucet search/info/open`, embedded static registry snapshot + `update`, table + JSON output, config scaffold (`~/.chainctl` bootstrap), basic error handling, `doctor` (env sanity), `version`, shell completion. Ship as a direct binary download (`cargo install chainctl` from day one since it's a Rust project; broader packaging expands later per §13).
-
-**Phase 2 — Recommendation Engine** ✅ shipped
-`faucet recommend`/`open`/`info` ranked by configurable weighted scoring (`chainctl-scoring`), `--explain` breakdown, a `communityRating` registry field (crowdsourced, manually curated via registry PRs), and weights readable from `config.yaml` (`recommend.weights.*`). Live health data already feeds the `availability`/`latency` factors here via a simple TTL read-through cache (`~/.chainctl/cache/health.json`, `cache.ttlMinutes`) — `faucet status` populates it directly, and `recommend`/`open`/`info` populate it lazily (probe-on-miss) using the same sequential checker built in Phase 1. What's *not* here yet, and stays Phase 3: making that checker concurrent/bounded, TLS-expiry inspection, and per-host rate ceilings independent of the global TTL.
-
-**Phase 3 — Health Monitoring** ✅ shipped
-The health checker is now genuinely concurrent: `chainctl-provider::health::check_all` fans out via a `tokio::task::JoinSet` bounded by a `Semaphore` (`health.concurrency`, default 5), with an independent per-host throttle (min. 2s between two requests to the same host, regardless of concurrency) so a domain serving several faucets isn't hit by every worker at once. TLS certificate-expiry inspection is real, not stubbed: a second lightweight `native-tls` handshake (trust already established by the successful HTTP request; this one exists purely to read the leaf cert's `notAfter` via `x509-parser`) feeds a color-coded "SSL" column (`<N>d`, red ≤14d / yellow ≤30d) on `faucet status`. `faucet status --watch [--interval N]` loops with a 15s floor on the interval. This required making the call chain async end-to-end — `main.rs` is now `#[tokio::main]`; `chainctl-core`/`chainctl-scoring` remain fully synchronous per the boundary described in §15.
-
-**Phase 4 — RPC Module** ✅ shipped
-The first non-faucet top-level command — `chainctl rpc list/test/latency` — landed without touching a single line in `chainctl-core::domain`'s `Chain`/`Faucet` types, `chainctl-scoring`, or any existing command file, other than adding one match arm each to `Commands`/`dispatch` in [commands/mod.rs](crates/chainctl/src/commands/mod.rs): the "new module, no refactor" claim held. `rpc list` reads the registry's existing `rpcUrls` (no schema change needed). `rpc test` does something a bare reachability check can't: it calls `eth_chainId` over real JSON-RPC and checks the response against the registry's `chainId`, catching a wrong/misconfigured endpoint, not just a dead one — verified live against all 7 chains, correctly flagging two flaky public endpoints (`rpc.sepolia.org`, `rpc-amoy.polygon.technology`) that were reachable-looking but failing. `rpc latency <chain> --samples N` benchmarks repeated calls (min/avg/max). Reuses `chainctl-provider`'s `JoinSet`+`Semaphore` concurrency pattern from Phase 3, deliberately *without* the per-host throttle — RPC nodes are built for frequent traffic, unlike faucet claim endpoints.
-
-**Phase 5 — Full Developer Platform** ✅ shipped (telemetry deliberately not — see below)
-Every module in the original command tree landed, each doing real work rather than a stub, all reusing the `chainctl-provider::jsonrpc::call` helper introduced this phase:
-- **`network`** closed a gap that had existed since §7 was first written: `registry.override.json` merging was documented but never implemented until now. `chainctl network add/list/remove` writes it; `chainctl_registry::load_with_overrides` merges it into *every* command's view of the registry, not just a standalone "list custom chains" view.
-- **`explorer`** builds `{explorerUrl}/tx/{hash}` and `/address/{addr}` links from data the registry already had.
-- **`gas`/`wallet`/`tx`** are thin, honest wrappers over `eth_gasPrice`/`eth_estimateGas`, `eth_getBalance`, and `eth_getTransactionByHash`+`eth_getTransactionReceipt` — `wallet` is deliberately read-only, no `generate` subcommand (see tradeoffs).
-- **`abi`/`contract`** use a from-scratch ABI encoder/decoder (`chainctl-provider::abi` — keccak256 selectors via `sha3`, EIP-55 checksumming, static + dynamic-type support for `address`/`bool`/`string`/`bytes`/`bytesN`/`uintN`/`intN`) with `cast`-style human-readable signatures (`"balanceOf(address)(uint256)"`) instead of Etherscan-ABI-JSON + API key. Verified live: `contract read` against the real Multicall3 contract's `getChainId()(uint256)` returned Base Sepolia's actual chain ID (84532); `abi encode "transfer(address,uint256)" ...` independently reproduced ERC-20's real, famous `0xa9059cbb` selector.
-- **`ens`** — full namehash (EIP-137) + registry/resolver `eth_call` resolution against real Ethereum mainnet, config-driven via `ens.rpcUrl` (independent of whatever testnet the rest of the tool is pointed at, since ENS only exists on mainnet). The one hardcoded constant that mattered — the ENS Registry address — was verified against Etherscan/Bloxy/Bitquery rather than typed from memory, after an initial recollection came up one hex digit short. `ens resolve vitalik.eth` → `ens reverse <that address>` round-tripped back to `vitalik.eth` live.
-- **Plugin convention**: an unrecognized first argument is looked up as `chainctl-<name>` on `$PATH` and exec'd with the remaining args, using Clap's own subcommand list (`Cli::command().get_subcommands()`) so the known-command check can't drift out of sync with the actual `Commands` enum. Verified live with a throwaway `chainctl-hello` binary.
-- **Telemetry**: not built. "Opt-in telemetry for crowdsourced reliability data" needs a collection endpoint, and none exists — building the client-side sender with nothing to receive it would be a hollow feature, not a working one. The `telemetry.enabled: false` config key stays as a documented placeholder for whenever that backend exists.
-
----
-
-## 15. Potential Challenges & Tradeoffs
-
-- **Faucet sites change constantly.** Mitigation: community-maintained registry via PRs + CI health-smoke-test on every registry PR + `lastVerifiedAt` staleness surfaced in `faucet info`, rather than trying to scrape/reverse-engineer each site.
-- **No auto-claim in scope, deliberately.** Faucets use CAPTCHA/anti-bot measures precisely to prevent automation; building auto-claim would (a) violate most faucets' ToS, (b) turn ChainCTL into an abuse vector, (c) require constantly fighting anti-bot changes. ChainCTL automates *discovery and triage*, not the claim itself — `faucet open` gets the developer to the right page in one command, which is most of the value without the ethical/technical liability. A future "assisted claim" (pre-filling a wallet address via supported URL query params, where a faucet explicitly supports it) is a plausible Phase 5+ opt-in extension, not MVP.
-- **Registry supply-chain trust.** The registry is executable-adjacent data (URLs a user will open, requirements a user will trust). Mitigate with: HTTPS-only source, checksum-verified `update`, human-reviewed PRs, CI schema + domain-sanity validation, no arbitrary code — it's inert JSON only.
-- **Rate-limiting/abuse of third-party infra during health checks.** Addressed in §9; also worth publishing a clear `SECURITY.md`/README statement of intent so faucet operators understand what's hitting their servers and why, with an easy opt-out path.
-- **Cross-platform browser-opening edge cases** (WSL, headless CI, SSH sessions without X11/display forwarding). Shipped as a simpler fallback than originally sketched: `browser::open_url`'s failure becomes a `BrowserLaunchFailed` error whose `.hint()` prints the URL to open manually (§11) — no proactive environment detection and no QR code yet; that's a reasonable future enhancement, not a current gap in `faucet open`/`explorer`'s usability.
-- **OS-specific config/cache directory conventions.** Use the `directories` crate's `ProjectDirs` plus an explicit `$CHAINCTL_HOME` override rather than hardcoding `~/.chainctl` blindly — keeps Windows/macOS/Linux all correct with one well-maintained dependency instead of hand-rolled per-OS logic.
-- **Rust-specific: async infects the call graph.** Once `chainctl-provider`'s network calls are `async` (via `reqwest`+`tokio`), every layer above them has to be `async` too, or cross an explicit sync/async boundary. This played out exactly as anticipated across Phases 3–5: `chainctl-core` and `chainctl-scoring` stayed fully synchronous and I/O-free by construction, the async boundary stayed confined to `chainctl-provider` and the `chainctl` bin crate's command handlers that call it, and `main.rs` uses a single `#[tokio::main]` entrypoint so that boundary only exists once, at the very top.
-- **Registry schema evolution.** Semver the schema (`version` field) independent of the CLI's own version; write forward migration functions so old cached registries don't hard-break `update`.
-- **Distribution surface area.** Homebrew + Scoop + apt/deb + AUR + Docker image is a lot to maintain long-term — Phase 1 intentionally ships only binary + Homebrew, expanding the matrix as the project gains contributors, to avoid over-investing in release infra before there's a user base.
-- **Compiled-in modules vs. true plugin system.** Early phases keep every module compiled into one binary (like `kubectl`'s built-ins) — simplest, single install, consistent UX. A `git`/`kubectl`-style `chainctl-<verb>`-on-`PATH` plugin convention is deferred to Phase 5, once there's a concrete community demand for out-of-tree modules; introducing it earlier adds indirection (dynamic discovery, versioning-compat surface) with no current payoff.
-- **`wallet` module scope (Phase 5).** Shipped as explicitly read-only (`wallet balance` via `eth_getBalance` against public RPCs) — no `generate`, no private key handling, no signing, no custody — to keep ChainCTL out of the security blast radius of a key-management tool. If real wallet integration is ever wanted, it should delegate to an existing audited signer (e.g., a hardware wallet or an external key-management tool) rather than reimplementing key storage.
-- **Hand-rolled ABI encoding instead of alloy/ethers (Phase 5).** `chainctl-provider::abi` supports the types that cover the overwhelming majority of real contract-read usage (`address`, `bool`, `string`, `bytes`, `bytesN`, `uintN`/non-negative `intN`) but not arrays, tuples, or negative `int` values — a deliberate scope cut to avoid pulling in the much larger alloy dependency tree (and the API-surface risk of getting it right from memory) for what this tool actually needs: encoding/decoding flat parameter lists for `cast`-style read calls. Callers get a clear "unsupported type" error, not a silently wrong encoding. Full ABI generality is a reasonable future addition if a real need for arrays/tuples shows up.
-- **Hardcoded protocol constants need external verification, not memory.** The ENS Registry address is exactly the kind of constant where one wrong hex digit produces a plausible-looking but silently-broken feature. It was checked against three independent sources (Etherscan, Bloxy, Bitquery) before shipping, after an initial from-memory attempt came up one digit short — a pattern worth repeating for any future hardcoded contract address (e.g., if Phase 6+ ever hardcodes Multicall3's address instead of taking it as a `contract read` argument).
-
----
-
-## Notes on Scope
-
-- **License, GitHub repo layout, CI/release automation**: owned by you outside this document — not detailed here.
-- **Registry hosting** (same repo vs. separate `chainctl-registry` repo): your call as part of the GitHub-side setup; the Rust workspace here assumes `configs/registry.snapshot.json` ships embedded in the binary regardless of where the source-of-truth registry ultimately lives.
-- **Initial chain list**: the 7 originally listed (Ethereum Sepolia, Base Sepolia, Polygon Amoy, Optimism Sepolia, Arbitrum Sepolia, Avalanche Fuji, BNB Testnet) are used as the Phase 1 embedded snapshot below — flag if any should change.
-- **Telemetry**: left fully opt-in/off-by-default per §14 Phase 5; nothing telemetry-related is built in Phase 1.
-
-Phase 1 implementation starts with the Cargo workspace init, the `chainctl-core` domain types, and the `chains`/`faucet info` command pair as the thinnest possible vertical slice through every architectural layer — proving the wiring before building outward.
