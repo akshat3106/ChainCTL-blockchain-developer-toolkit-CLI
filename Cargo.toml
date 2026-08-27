@@ -13,8 +13,8 @@ members = [
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/chainctl/chainctl"
-authors = ["ChainCTL Contributors"]
+repository = "https://github.com/akshat3106/ChainCTL-blockchain-developer-toolkit-CLI"
+authors = ["Akshat Jha <akshatjha3125@gmail.com>"]
 
 [workspace.dependencies]
 chainctl-core = { path = "crates/chainctl-core" }
