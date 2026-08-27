@@ -1,6 +1,14 @@
 # ChainCTL
 
-**A blockchain developer toolkit CLI** — testnet faucet discovery, RPC diagnostics, gas/wallet/tx lookups, ABI encoding, contract reads, and ENS resolution, all in one command-line tool that feels like `git`/`kubectl`/`cast`.
+[![Release](https://img.shields.io/github/v/release/akshat3106/ChainCTL-blockchain-developer-toolkit-CLI?color=blue)](https://github.com/akshat3106/ChainCTL-blockchain-developer-toolkit-CLI/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey)](https://github.com/akshat3106/ChainCTL-blockchain-developer-toolkit-CLI/releases/latest)
+[![Built with Rust](https://img.shields.io/badge/built%20with-Rust-orange?logo=rust&logoColor=white)](https://www.rust-lang.org/)
+
+**Stop hunting for testnet tokens.** ChainCTL ranks every known faucet for a chain by live
+availability, latency, and source — and shows you exactly how it scored them. It also bundles the
+everyday EVM lookups you'd otherwise open five browser tabs for: RPC diagnostics, gas, balances,
+transaction status, ABI encoding, contract reads, and ENS.
 
 ```
 $ chainctl faucet recommend base --explain
@@ -15,7 +23,8 @@ Recommended: Base Official Faucet for Base Sepolia — score 81.7/100
     recentFailures   +0.0
 ```
 
-No API keys required for anything in this README. Every example below was run against real, live endpoints.
+**One static binary. No API keys, no Node, no Python, no config to get started.**
+Every example in this README was run against real, live endpoints.
 
 ---
 
