@@ -1,0 +1,24 @@
+[package]
+name = "chainctl"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "chainctl"
+path = "src/main.rs"
+
+[dependencies]
+chainctl-core = { workspace = true }
+chainctl-registry = { workspace = true }
+chainctl-scoring = { workspace = true }
+chainctl-provider = { workspace = true }
+chainctl-output = { workspace = true }
+
+clap = { workspace = true }
+serde_yaml = { workspace = true }
+serde_json = { workspace = true }
+owo-colors = { workspace = true }
+tokio = { workspace = true }
+chrono = { workspace = true }

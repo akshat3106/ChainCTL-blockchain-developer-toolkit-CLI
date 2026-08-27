@@ -1,0 +1,244 @@
+{
+  "$schema": "https://chainctl.dev/schemas/registry-v1.json",
+  "version": "1.0.0",
+  "updatedAt": "2026-07-28T00:00:00Z",
+  "chains": [
+    {
+      "id": "ethereum-sepolia",
+      "name": "Ethereum Sepolia",
+      "chainId": 11155111,
+      "symbol": "ETH",
+      "network": "testnet",
+      "parentChain": "ethereum",
+      "explorerUrl": "https://sepolia.etherscan.io",
+      "rpcUrls": ["https://rpc.sepolia.org"],
+      "aliases": ["ethereum", "eth", "sepolia"],
+      "faucets": [
+        {
+          "id": "eth-sepolia-alchemy",
+          "name": "Alchemy Sepolia Faucet",
+          "url": "https://www.alchemy.com/faucets/ethereum-sepolia",
+          "source": "partner",
+          "provider": "Alchemy",
+          "requirements": { "githubAuth": false, "discordAuth": false, "captcha": true, "walletConnect": false },
+          "cooldown": { "amount": 24, "unit": "hours" },
+          "dailyLimit": null,
+          "amountPerClaim": { "amount": "0.1", "symbol": "ETH" },
+          "priority": 1,
+          "excludeFromHealthCheck": false,
+          "tags": ["fast"],
+          "healthCheck": { "method": "HEAD", "endpoint": "https://www.alchemy.com/faucets/ethereum-sepolia", "expectedStatus": [200, 301, 302] },
+          "metadata": { "addedAt": "2026-01-10T00:00:00Z", "lastVerifiedAt": "2026-07-20T00:00:00Z", "maintainer": "chainctl-core" },
+          "communityRating": 82
+        },
+        {
+          "id": "eth-sepolia-google",
+          "name": "Google Cloud Web3 Sepolia Faucet",
+          "url": "https://cloud.google.com/application/web3/faucet/ethereum/sepolia",
+          "source": "partner",
+          "provider": "Google Cloud",
+          "requirements": { "githubAuth": false, "discordAuth": false, "captcha": false, "walletConnect": false },
+          "cooldown": { "amount": 24, "unit": "hours" },
+          "dailyLimit": null,
+          "amountPerClaim": { "amount": "0.05", "symbol": "ETH" },
+          "priority": 2,
+          "excludeFromHealthCheck": false,
+          "tags": ["no-captcha"],
+          "healthCheck": { "method": "HEAD", "endpoint": "https://cloud.google.com/application/web3/faucet/ethereum/sepolia", "expectedStatus": [200, 301, 302] },
+          "metadata": { "addedAt": "2026-01-10T00:00:00Z", "lastVerifiedAt": "2026-07-20T00:00:00Z", "maintainer": "chainctl-core" }
+        }
+      ]
+    },
+    {
+      "id": "base-sepolia",
+      "name": "Base Sepolia",
+      "chainId": 84532,
+      "symbol": "ETH",
+      "network": "testnet",
+      "parentChain": "ethereum",
+      "explorerUrl": "https://sepolia.basescan.org",
+      "rpcUrls": ["https://sepolia.base.org"],
+      "aliases": ["base", "base-testnet"],
+      "faucets": [
+        {
+          "id": "base-official",
+          "name": "Base Official Faucet",
+          "url": "https://portal.cdp.coinbase.com/products/faucet",
+          "source": "official",
+          "provider": "Coinbase",
+          "requirements": { "githubAuth": true, "discordAuth": false, "captcha": true, "walletConnect": false, "minMainnetBalance": { "chain": "ethereum", "amount": "0.001", "symbol": "ETH" } },
+          "cooldown": { "amount": 24, "unit": "hours" },
+          "dailyLimit": null,
+          "amountPerClaim": { "amount": "0.05", "symbol": "ETH" },
+          "priority": 1,
+          "excludeFromHealthCheck": false,
+          "tags": ["official", "fast"],
+          "healthCheck": { "method": "HEAD", "endpoint": "https://portal.cdp.coinbase.com/products/faucet", "expectedStatus": [200, 301, 302] },
+          "metadata": { "addedAt": "2026-01-10T00:00:00Z", "lastVerifiedAt": "2026-07-20T00:00:00Z", "maintainer": "chainctl-core" },
+          "communityRating": 91
+        },
+        {
+          "id": "base-sepolia-alchemy",
+          "name": "Alchemy Base Sepolia Faucet",
+          "url": "https://www.alchemy.com/faucets/base-sepolia",
+          "source": "partner",
+          "provider": "Alchemy",
+          "requirements": { "githubAuth": false, "discordAuth": false, "captcha": true, "walletConnect": false },
+          "cooldown": { "amount": 24, "unit": "hours" },
+          "dailyLimit": null,
+          "amountPerClaim": { "amount": "0.1", "symbol": "ETH" },
+          "priority": 2,
+          "excludeFromHealthCheck": false,
+          "tags": [],
+          "healthCheck": { "method": "HEAD", "endpoint": "https://www.alchemy.com/faucets/base-sepolia", "expectedStatus": [200, 301, 302] },
+          "metadata": { "addedAt": "2026-01-10T00:00:00Z", "lastVerifiedAt": "2026-07-20T00:00:00Z", "maintainer": "chainctl-core" }
+        }
+      ]
+    },
+    {
+      "id": "polygon-amoy",
+      "name": "Polygon Amoy",
+      "chainId": 80002,
+      "symbol": "POL",
+      "network": "testnet",
+      "parentChain": "polygon",
+      "explorerUrl": "https://amoy.polygonscan.com",
+      "rpcUrls": ["https://rpc-amoy.polygon.technology"],
+      "aliases": ["polygon", "amoy"],
+      "faucets": [
+        {
+          "id": "polygon-official",
+          "name": "Polygon Official Faucet",
+          "url": "https://faucet.polygon.technology/",
+          "source": "official",
+          "provider": "Polygon Labs",
+          "requirements": { "githubAuth": false, "discordAuth": true, "captcha": true, "walletConnect": false },
+          "cooldown": { "amount": 24, "unit": "hours" },
+          "dailyLimit": null,
+          "amountPerClaim": { "amount": "0.5", "symbol": "POL" },
+          "priority": 1,
+          "excludeFromHealthCheck": false,
+          "tags": ["official"],
+          "healthCheck": { "method": "HEAD", "endpoint": "https://faucet.polygon.technology/", "expectedStatus": [200, 301, 302] },
+          "metadata": { "addedAt": "2026-01-10T00:00:00Z", "lastVerifiedAt": "2026-07-20T00:00:00Z", "maintainer": "chainctl-core" }
+        }
+      ]
+    },
+    {
+      "id": "optimism-sepolia",
+      "name": "Optimism Sepolia",
+      "chainId": 11155420,
+      "symbol": "ETH",
+      "network": "testnet",
+      "parentChain": "ethereum",
+      "explorerUrl": "https://sepolia-optimism.etherscan.io",
+      "rpcUrls": ["https://sepolia.optimism.io"],
+      "aliases": ["optimism", "op", "op-sepolia"],
+      "faucets": [
+        {
+          "id": "optimism-superchain-faucet",
+          "name": "Superchain Faucet",
+          "url": "https://console.optimism.io/faucet",
+          "source": "official",
+          "provider": "Optimism Foundation",
+          "requirements": { "githubAuth": true, "discordAuth": false, "captcha": true, "walletConnect": false },
+          "cooldown": { "amount": 24, "unit": "hours" },
+          "dailyLimit": null,
+          "amountPerClaim": { "amount": "0.05", "symbol": "ETH" },
+          "priority": 1,
+          "excludeFromHealthCheck": false,
+          "tags": ["official"],
+          "healthCheck": { "method": "HEAD", "endpoint": "https://console.optimism.io/faucet", "expectedStatus": [200, 301, 302] },
+          "metadata": { "addedAt": "2026-01-10T00:00:00Z", "lastVerifiedAt": "2026-07-20T00:00:00Z", "maintainer": "chainctl-core" }
+        }
+      ]
+    },
+    {
+      "id": "arbitrum-sepolia",
+      "name": "Arbitrum Sepolia",
+      "chainId": 421614,
+      "symbol": "ETH",
+      "network": "testnet",
+      "parentChain": "ethereum",
+      "explorerUrl": "https://sepolia.arbiscan.io",
+      "rpcUrls": ["https://sepolia-rollup.arbitrum.io/rpc"],
+      "aliases": ["arbitrum", "arb", "arb-sepolia"],
+      "faucets": [
+        {
+          "id": "arbitrum-sepolia-alchemy",
+          "name": "Alchemy Arbitrum Sepolia Faucet",
+          "url": "https://www.alchemy.com/faucets/arbitrum-sepolia",
+          "source": "partner",
+          "provider": "Alchemy",
+          "requirements": { "githubAuth": false, "discordAuth": false, "captcha": true, "walletConnect": false },
+          "cooldown": { "amount": 24, "unit": "hours" },
+          "dailyLimit": null,
+          "amountPerClaim": { "amount": "0.1", "symbol": "ETH" },
+          "priority": 1,
+          "excludeFromHealthCheck": false,
+          "tags": [],
+          "healthCheck": { "method": "HEAD", "endpoint": "https://www.alchemy.com/faucets/arbitrum-sepolia", "expectedStatus": [200, 301, 302] },
+          "metadata": { "addedAt": "2026-01-10T00:00:00Z", "lastVerifiedAt": "2026-07-20T00:00:00Z", "maintainer": "chainctl-core" }
+        }
+      ]
+    },
+    {
+      "id": "avalanche-fuji",
+      "name": "Avalanche Fuji",
+      "chainId": 43113,
+      "symbol": "AVAX",
+      "network": "testnet",
+      "parentChain": "avalanche",
+      "explorerUrl": "https://testnet.snowtrace.io",
+      "rpcUrls": ["https://api.avax-test.network/ext/bc/C/rpc"],
+      "aliases": ["avalanche", "avax", "fuji"],
+      "faucets": [
+        {
+          "id": "avalanche-official",
+          "name": "Avalanche Core Testnet Faucet",
+          "url": "https://core.app/tools/testnet-faucet/",
+          "source": "official",
+          "provider": "Ava Labs",
+          "requirements": { "githubAuth": false, "discordAuth": false, "captcha": true, "walletConnect": false },
+          "cooldown": { "amount": 24, "unit": "hours" },
+          "dailyLimit": null,
+          "amountPerClaim": { "amount": "2", "symbol": "AVAX" },
+          "priority": 1,
+          "excludeFromHealthCheck": false,
+          "tags": ["official"],
+          "healthCheck": { "method": "HEAD", "endpoint": "https://core.app/tools/testnet-faucet/", "expectedStatus": [200, 301, 302] },
+          "metadata": { "addedAt": "2026-01-10T00:00:00Z", "lastVerifiedAt": "2026-07-20T00:00:00Z", "maintainer": "chainctl-core" }
+        }
+      ]
+    },
+    {
+      "id": "bnb-testnet",
+      "name": "BNB Testnet",
+      "chainId": 97,
+      "symbol": "tBNB",
+      "network": "testnet",
+      "parentChain": "bnb",
+      "explorerUrl": "https://testnet.bscscan.com",
+      "rpcUrls": ["https://data-seed-prebsc-1-s1.bnbchain.org:8545"],
+      "aliases": ["bnb", "bsc", "bsc-testnet"],
+      "faucets": [
+        {
+          "id": "bnb-official",
+          "name": "BNB Chain Testnet Faucet",
+          "url": "https://www.bnbchain.org/en/testnet-faucet",
+          "source": "official",
+          "provider": "BNB Chain",
+          "requirements": { "githubAuth": false, "discordAuth": false, "captcha": true, "walletConnect": false },
+          "cooldown": { "amount": 24, "unit": "hours" },
+          "dailyLimit": null,
+          "amountPerClaim": { "amount": "0.3", "symbol": "tBNB" },
+          "priority": 1,
+          "excludeFromHealthCheck": false,
+          "tags": ["official"],
+          "healthCheck": { "method": "HEAD", "endpoint": "https://www.bnbchain.org/en/testnet-faucet", "expectedStatus": [200, 301, 302] },
+          "metadata": { "addedAt": "2026-01-10T00:00:00Z", "lastVerifiedAt": "2026-07-20T00:00:00Z", "maintainer": "chainctl-core" }
+        }
+      ]
+    }
+  ]
+}

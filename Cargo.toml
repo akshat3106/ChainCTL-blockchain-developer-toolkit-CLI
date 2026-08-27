@@ -1,0 +1,47 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/chainctl",
+    "crates/chainctl-core",
+    "crates/chainctl-registry",
+    "crates/chainctl-scoring",
+    "crates/chainctl-provider",
+    "crates/chainctl-output",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/chainctl/chainctl"
+authors = ["ChainCTL Contributors"]
+
+[workspace.dependencies]
+chainctl-core = { path = "crates/chainctl-core" }
+chainctl-registry = { path = "crates/chainctl-registry" }
+chainctl-scoring = { path = "crates/chainctl-scoring" }
+chainctl-provider = { path = "crates/chainctl-provider" }
+chainctl-output = { path = "crates/chainctl-output" }
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+thiserror = "1"
+clap = { version = "4", features = ["derive"] }
+directories = "5"
+open = "5"
+comfy-table = "7"
+owo-colors = "4"
+chrono = { version = "0.4", features = ["serde"] }
+reqwest = { version = "0.12", features = ["json"] }
+anyhow = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync", "net"] }
+native-tls = "0.2"
+tokio-native-tls = "0.3"
+x509-parser = "0.16"
+sha3 = "0.10"
+
+[profile.release]
+lto = true
+strip = true
+codegen-units = 1

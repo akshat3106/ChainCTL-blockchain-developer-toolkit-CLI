@@ -1,0 +1,14 @@
+[package]
+name = "chainctl-output"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+chainctl-core = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+comfy-table = { workspace = true }
+owo-colors = { workspace = true }
+chrono = { workspace = true }

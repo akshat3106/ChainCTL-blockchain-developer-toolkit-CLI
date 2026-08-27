@@ -1,0 +1,26 @@
+version: 1
+output:
+  format: table
+  color: auto
+  icons: true
+registry:
+  source: ""
+  updateIntervalHours: 24
+cache:
+  ttlMinutes: 30
+health:
+  concurrency: 5
+  timeoutSeconds: 5
+recommend:
+  weights:
+    official: 0.40
+    availability: 0.30
+    latency: 0.15
+    community: 0.10
+    recentFailures: 0.05
+ens:
+  # ENS only exists on Ethereum mainnet, independent of whichever testnet
+  # other commands are pointed at — override with `config set ens.rpcUrl`.
+  rpcUrl: "https://ethereum-rpc.publicnode.com"
+telemetry:
+  enabled: false

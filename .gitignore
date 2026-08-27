@@ -1,0 +1,43 @@
+# Rust build artifacts
+/target
+**/*.rs.bk
+*.pdb
+
+# graphify knowledge-graph output
+graphify-out/
+
+# Local chainctl runtime state — belongs in ~/.chainctl, never in the repo
+.chainctl/
+/registry.json
+/registry.override.json
+cache/health.json
+logs/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.keystore
+*.p12
+secrets.*
+credentials.*
+
+# Editor / IDE
+.vscode/
+.idea/
+*.iml
+*.swp
+*.swo
+*~
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Agent / tooling local state
+.claude/
+CLAUDE.local.md
