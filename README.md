@@ -127,9 +127,10 @@ chainctl --version
 **Windows (PowerShell)** — extract, then copy to a folder on your `PATH`:
 
 ```powershell
-Expand-Archive chainctl-x86_64-pc-windows-msvc.zip -DestinationPath .
+# the Windows zip extracts flat — chainctl.exe lands directly in -DestinationPath
+Expand-Archive chainctl-x86_64-pc-windows-msvc.zip -DestinationPath .\chainctl-dl
 New-Item -ItemType Directory -Force "$env:USERPROFILE\bin" | Out-Null
-Copy-Item .\chainctl-x86_64-pc-windows-msvc\chainctl.exe "$env:USERPROFILE\bin\chainctl.exe"
+Copy-Item .\chainctl-dl\chainctl.exe "$env:USERPROFILE\bin\chainctl.exe"
 ```
 
 If `$env:USERPROFILE\bin` isn't on your `PATH` yet, add it once (persists for your user):
