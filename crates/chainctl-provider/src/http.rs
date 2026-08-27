@@ -2,7 +2,13 @@ use std::time::Duration;
 
 use chainctl_core::ChainctlError;
 
-pub(crate) const USER_AGENT: &str = concat!("chainctl/", env!("CARGO_PKG_VERSION"), " (+https://github.com/chainctl/chainctl)");
+pub(crate) const USER_AGENT: &str = concat!(
+    "chainctl/",
+    env!("CARGO_PKG_VERSION"),
+    " (+",
+    env!("CARGO_PKG_REPOSITORY"),
+    ")"
+);
 
 /// Fetches `url` as text with a short timeout and an honest User-Agent
 /// (ARCHITECTURE.md §9 — health/registry probes must identify themselves).

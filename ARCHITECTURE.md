@@ -323,7 +323,7 @@ cache:
 health:
   concurrency: 5
   timeoutSeconds: 5
-  userAgent: "chainctl/1.0 (+https://github.com/chainctl/chainctl)"
+  userAgent: "chainctl/1.0 (+https://github.com/akshat3106/ChainCTL-blockchain-developer-toolkit-CLI)"
 recommend:
   weights:
     official: 0.40
@@ -428,7 +428,7 @@ chainctl
 2. **Cache aggressively.** Default TTL 30 min; repeated `chainctl faucet status` calls within the window serve cached results, no new requests.
 3. **Bounded, jittered concurrency.** Global worker pool cap (default 5, configurable) with randomized inter-request delay (50–300ms jitter) — no thundering herd against any single host.
 4. **Per-host rate ceiling.** Independent of global concurrency, cap requests per host (e.g., 1 per 5 minutes) regardless of how many faucets on that domain are being checked, tracked via `cacherepo`.
-5. **Identify honestly.** Custom `User-Agent: chainctl/<version> (+github.com/chainctl/chainctl)` so operators can identify and, if needed, block or contact the project — never spoof a browser UA.
+5. **Identify honestly.** Custom `User-Agent: chainctl/<version> (+https://github.com/akshat3106/ChainCTL-blockchain-developer-toolkit-CLI)` (derived at compile time from `CARGO_PKG_REPOSITORY`, so it tracks the manifest) so operators can identify and, if needed, block or contact the project — never spoof a browser UA.
 6. **Opt-out respected.** `excludeFromHealthCheck: true` in the registry entry (settable via PR by the faucet operator) skips active probing entirely; status shows `unknown (opt-out)`.
 7. **No claim-flow automation in the health engine** — it only checks reachability/latency/TLS of the published URL, never submits forms or attempts a claim. Automating claims is explicitly out of scope (see §10).
 8. **Background/scheduled checking is opt-in only** (`chainctl faucet status --watch`, or a user-installed cron); ChainCTL does not silently run a background daemon.
