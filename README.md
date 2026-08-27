@@ -79,40 +79,108 @@ Everything is a single static binary. No Node, no Python, no config required to 
 
 ## Installation
 
-### Prerequisites
+No Rust toolchain required — prebuilt binaries are published for macOS, Linux, and Windows.
 
-You need the Rust toolchain (this project targets recent stable Rust). If you don't have it:
+### One-command install (recommended)
+
+**macOS / Linux:**
 
 ```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh   # macOS/Linux
-# or, on Windows: winget install Rustlang.Rustup
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/akshat3106/ChainCTL-blockchain-developer-toolkit-CLI/releases/latest/download/chainctl-installer.sh | sh
+```
+
+**Windows (PowerShell):**
+
+```powershell
+powershell -ExecutionPolicy Bypass -c "irm https://github.com/akshat3106/ChainCTL-blockchain-developer-toolkit-CLI/releases/latest/download/chainctl-installer.ps1 | iex"
+```
+
+The installer downloads the right binary for your platform, places it in your Cargo home
+(`~/.cargo/bin`, or `%USERPROFILE%\.cargo\bin` on Windows), and adds that directory to your
+`PATH` if it isn't there already.
+
+> **Open a new terminal afterwards.** A shell that was already running keeps its own copy of
+> `PATH` from when it started, so `chainctl` won't be found in that window until you restart it.
+> This is not a bug — it's how `PATH` works on every OS.
+
+### Manual install
+
+Prefer to do it by hand, or the installer didn't fit your setup? Grab an archive from the
+[latest release](https://github.com/akshat3106/ChainCTL-blockchain-developer-toolkit-CLI/releases/latest):
+
+| Platform | Archive |
+|---|---|
+| Apple Silicon macOS | `chainctl-aarch64-apple-darwin.tar.xz` |
+| Intel macOS | `chainctl-x86_64-apple-darwin.tar.xz` |
+| x64 Linux | `chainctl-x86_64-unknown-linux-gnu.tar.xz` |
+| ARM64 Linux | `chainctl-aarch64-unknown-linux-gnu.tar.xz` |
+| x64 Windows | `chainctl-x86_64-pc-windows-msvc.zip` |
+
+**macOS / Linux** — extract and put the binary on your `PATH`:
+
+```bash
+tar -xf chainctl-x86_64-unknown-linux-gnu.tar.xz
+sudo mv chainctl-x86_64-unknown-linux-gnu/chainctl /usr/local/bin/
+chainctl --version
+```
+
+**Windows (PowerShell)** — extract, then copy to a folder on your `PATH`:
+
+```powershell
+Expand-Archive chainctl-x86_64-pc-windows-msvc.zip -DestinationPath .
+New-Item -ItemType Directory -Force "$env:USERPROFILE\bin" | Out-Null
+Copy-Item .\chainctl-x86_64-pc-windows-msvc\chainctl.exe "$env:USERPROFILE\bin\chainctl.exe"
+```
+
+If `$env:USERPROFILE\bin` isn't on your `PATH` yet, add it once (persists for your user):
+
+```powershell
+[Environment]::SetEnvironmentVariable(
+    "Path",
+    [Environment]::GetEnvironmentVariable("Path", "User") + ";$env:USERPROFILE\bin",
+    "User")
+```
+
+Then **open a new PowerShell window** and run `chainctl --version`.
+
+### Verify the checksum (optional)
+
+Every archive ships with a matching `.sha256`:
+
+```bash
+sha256sum -c chainctl-x86_64-unknown-linux-gnu.tar.xz.sha256
+```
+
+```powershell
+# Windows: compare against the .sha256 file's contents
+Get-FileHash .\chainctl-x86_64-pc-windows-msvc.zip -Algorithm SHA256
 ```
 
 ### Build from source
 
+Requires the Rust toolchain (recent stable). Install it from [rustup.rs](https://rustup.rs) if needed:
+
 ```bash
-git clone https://github.com/chainctl/chainctl.git   # replace with your fork/remote
-cd chainctl
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh   # macOS/Linux
+winget install Rustlang.Rustup                                   # Windows
+```
+
+Then:
+
+```bash
+git clone https://github.com/akshat3106/ChainCTL-blockchain-developer-toolkit-CLI.git
+cd ChainCTL-blockchain-developer-toolkit-CLI
 cargo build --release
 ```
 
-The binary is at `target/release/chainctl` (or `target\release\chainctl.exe` on Windows). Put it on your `PATH`:
-
-```bash
-# macOS/Linux
-sudo cp target/release/chainctl /usr/local/bin/
-
-# Windows (PowerShell, current user)
-Copy-Item target\release\chainctl.exe "$env:USERPROFILE\bin\chainctl.exe"   # ensure that dir is on PATH
-```
-
-Or run it straight out of the build directory for local development:
+The binary lands at `target/release/chainctl` (`target\release\chainctl.exe` on Windows). Copy it
+onto your `PATH` as shown above, or run it in place during development:
 
 ```bash
 cargo run -- chains
 ```
 
-Verify it's working:
+### Confirm it works
 
 ```bash
 $ chainctl doctor
@@ -121,7 +189,13 @@ $ chainctl doctor
 ✓ Local registry.json    not present yet — run `chainctl update`
 ```
 
-> No network access required for this — the registry ships embedded in the binary.
+> No network access needed for this check — the registry ships embedded in the binary.
+
+**If `chainctl` isn't found:** the binary exists but its folder isn't on your `PATH`. Open a new
+terminal first (see the note above). If it still isn't found, check the folder is really on `PATH`
+(`echo $PATH` / `$env:Path`) and that the binary is really in it. Running it by full path —
+`~/.cargo/bin/chainctl --version` — confirms the binary itself is fine and isolates the problem
+to `PATH`.
 
 ## Quick Start
 
